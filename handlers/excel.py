@@ -1,7 +1,7 @@
 import pandas as pd
-import os
 
 from config import LISTS_TO_CONVERT_TO_KG_H
+from handlers.database import DatabaseHandler
 
 
 class ExcelHandler:
@@ -39,3 +39,6 @@ class ExcelHandler:
             else:
                 converted_sheets[key] = df
         self.converted_sheets = converted_sheets
+
+    #def save_sheets_to_bd(self):
+
