@@ -70,3 +70,34 @@ class DatabaseHandler:
                  comments,
                  t_wg)
             )
+
+    def get_unique_fuels_in_experiments(self) -> int:
+        """
+        Метод, который возвращает количество уникальных fuel_id в таблице experiment.
+        """
+        with self.connection:
+            self.cursor.execute(
+                """
+                SELECT COUNT(DISTINCT fuel_id) AS unique_fuels_count FROM "main"."experiments"
+                """
+            )
+            result = self.cursor.fetchone()[0]
+        return result
+
+    def get_experiment_number(self, fuel_id: int) -> tuple[int, int]:
+        """
+        Метод, который возвращает для выбранного топлива количество экспериментов по воздуху и пару.
+
+        Returns:
+            tuple[int, int]: первое значения для количества экспериментов по воздуху, второе по пару.
+        """
+        with self.connection:
+            self.cursor.execute(
+                f"""
+                SELECT COUNT(F_air) AS count_F_air, COUNT(F_steam) AS count_F_steam
+                FROM "main"."experiments"
+                WHERE fuel_id = {fuel_id}
+                """
+            )
+            result = self.cursor.fetchone()
+        return result

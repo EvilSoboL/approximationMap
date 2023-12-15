@@ -25,6 +25,9 @@ class ExcelHandler:
         self.all_sheets = pd.read_excel(self.path_to_source, sheet_name=None)
 
     def convert_g_s_to_kg_h(self) -> None:
+        """
+        Метод, который переводит значения расхода топлива и добавочного компонента из г/ч в кг/ч.
+        """
         converted_sheets = dict()
         for key, df in self.all_sheets.items():
             if key in self.convert_to_kg_h:
@@ -59,6 +62,9 @@ class ExcelHandler:
         self.cleaned_sheets = cleaned_sheets
 
     def save_converted_sheets_to_bd(self) -> None:
+        """
+        Сохранение данных с обработанных листов excel в базу данных.
+        """
         for key, df in self.cleaned_sheets.items():
             if key == 'дт_воздух':
                 for _, row in df.iterrows():
