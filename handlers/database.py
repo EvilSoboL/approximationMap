@@ -17,21 +17,21 @@ class DatabaseHandler:
 
     def insert_into_experiments(
             self,
-            fuel_id,
-            F_fuel,
-            F_air,
-            F_steam,
-            O2,
-            CO,
-            NO,
-            NO2,
-            NOx,
-            CO2,
-            SO2,
-            P_air,
-            P_steam,
-            comments,
-            t_wg
+            fuel_id: int,
+            F_fuel: float,
+            F_air: float or None,
+            F_steam: float or None,
+            O2: float or None,
+            CO: float or None,
+            NO: float or None,
+            NO2: float or None,
+            NOx: float or None,
+            CO2: float or None,
+            SO2: float or None,
+            P_air: float or None,
+            P_steam: float or None,
+            comments: str or None,
+            t_wg: float or None
     ):
         with self.connection:
             self.cursor.execute(
@@ -70,21 +70,3 @@ class DatabaseHandler:
                  comments,
                  t_wg)
             )
-
-db = DatabaseHandler()
-db.insert_into_experiments(
-    1,
-    100,
-    100,
-    20,
-    None,
-    20,
-    20,
-    20,
-    20,
-    20,
-    20,
-    20,
-    20,
-    't'
-)
