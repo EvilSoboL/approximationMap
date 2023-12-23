@@ -4,4 +4,5 @@ from config import PATH_TO_EXCEL
 
 if __name__ == '__main__':
     ex = ExperimentData()
-    ex.experiments_info()
+    ex.get_experiment_data('diesel', 'air', 'CO')
+

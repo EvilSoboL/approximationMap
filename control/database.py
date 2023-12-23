@@ -149,7 +149,7 @@ class DatabaseHandler:
         )
         df = pd.read_sql(query, self.connection)
         if df.empty:
-            raise Warning(
+            raise ValueError(
                 f"Не найдено экспериментальных со следующими параметрами: {fuel_name}, {additive_name}, {component_name}"
             )
 
