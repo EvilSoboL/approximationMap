@@ -1,5 +1,5 @@
-from handlers.database import DatabaseHandler
-from handlers.experiment import ExperimentData
+from control.database import DatabaseHandler
+from control.experiment import ExperimentData
 from config import PATH_TO_EXCEL
 
 if __name__ == '__main__':

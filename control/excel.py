@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 from config import LISTS_TO_CONVERT_TO_KG_H
-from handlers.database import DatabaseHandler
+from control.database import DatabaseHandler
 
 
 class ExcelHandler:

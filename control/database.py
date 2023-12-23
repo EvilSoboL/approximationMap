@@ -1,4 +1,5 @@
 import sqlite3
+import pandas as pd
 
 from config import PATH_TO_DB
 
@@ -116,3 +117,40 @@ class DatabaseHandler:
             )
             result = self.cursor.fetchall()
         return result
+
+    def get_fuel_id_from_name(self, fuel_name: str) -> int:
+        with self.connection:
+            self.cursor.execute(
+                f"""
+                SELECT fuel_id
+                FROM "main"."fuels"
+                WHERE fuel_name = '{fuel_name}'
+                """
+            )
+            result = self.cursor.fetchone()[0]
+        return result
+
+    def get_experiment_data(self, fuel_name: str, additive_name: str, component_name: str) -> pd.DataFrame:
+        """
+        Метод, который по значению параметров возвращает экспериментальные данные из базы данных.
+
+        Args:
+            fuel_name: наименование топлива: diesel, crude_oil, heavy_oil, kerosene, waste_oil.
+            additive_name: наименование добовочного компонента: air, steam.
+            component_name: наименование компонета дымовых газов: O2, CO, NO и тд.
+        """
+        fuel_id = self.get_fuel_id_from_name(fuel_name)
+        query = (
+            f"""
+            SELECT F_fuel, F_{additive_name}, {component_name}
+            FROM "main"."experiments"
+            WHERE fuel_id = {fuel_id} AND F_{additive_name} IS NOT NULL AND {component_name} IS NOT NULL
+            """
+        )
+        df = pd.read_sql(query, self.connection)
+        if df.empty:
+            raise Warning(
+                f"Не найдено экспериментальных со следующими параметрами: {fuel_name}, {additive_name}, {component_name}"
+            )
+
+        return df

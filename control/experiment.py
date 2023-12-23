@@ -1,4 +1,4 @@
-from handlers.database import DatabaseHandler
+from control.database import DatabaseHandler
 
 
 class ExperimentData:
@@ -22,5 +22,5 @@ class ExperimentData:
             print(f'По воздуху: {experiments[0]}, по пару: {experiments[1]}')
             print('---')
 
-
-
+    def get_experiment_data(self):
+        pass
