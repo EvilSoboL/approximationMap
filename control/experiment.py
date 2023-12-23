@@ -56,7 +56,6 @@ class ExperimentData:
             CO(мг/м3) = ((21 - эталон.О2)/(21 - О2))*CO(ppm)*1.25
             NOx(мг/м3) = ((21 - эталон.О2)/(21 - О2))*2.05*(NO(ppm) + NO2(ppm))
         """
-        print(df)
         if 'CO' in list(self.df.columns):
             df['CO'] = ((21 - STANDARD_O2)/(21 - df['O2']))*df['CO']*1.25
             # Замена NaN значений кислорода на 750 мг/м3
