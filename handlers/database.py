@@ -101,3 +101,18 @@ class DatabaseHandler:
             )
             result = self.cursor.fetchone()
         return result
+
+    def get_fuel_id_and_names(self) -> list[tuple]:
+        """
+        Метод, который возвращает список из кортежей, где первое значение id топлива, второе - его наименование.
+        """
+        with self.connection:
+            self.cursor.execute(
+                """
+                SELECT fuel_id, fuel_name
+                FROM "main"."fuels"
+                ORDER BY fuel_id;
+                """
+            )
+            result = self.cursor.fetchall()
+        return result
