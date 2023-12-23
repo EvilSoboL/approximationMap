@@ -1,7 +1,7 @@
 import sqlite3
 import pandas as pd
 
-from config import PATH_TO_DB
+from config import PATH_TO_DB, COMPONENTS_TO_CONVERSATION_FROM_PPM_TO_MG_M3
 
 
 class DatabaseHandler:
@@ -140,13 +140,30 @@ class DatabaseHandler:
             component_name: наименование компонета дымовых газов: O2, CO, NO и тд.
         """
         fuel_id = self.get_fuel_id_from_name(fuel_name)
-        query = (
-            f"""
-            SELECT F_fuel, F_{additive_name}, {component_name}
-            FROM "main"."experiments"
-            WHERE fuel_id = {fuel_id} AND F_{additive_name} IS NOT NULL AND {component_name} IS NOT NULL
-            """
-        )
+        if component_name == 'CO':
+            query = (
+                f"""
+                SELECT F_fuel, F_{additive_name}, {component_name}, O2
+                FROM "main"."experiments"
+                WHERE fuel_id = {fuel_id} AND F_{additive_name} IS NOT NULL AND {component_name} IS NOT NULL
+                """
+            )
+        elif component_name == 'NOx':
+            query = (
+                f"""
+                SELECT F_fuel, F_{additive_name}, {component_name}, O2, NO, NO2
+                FROM "main"."experiments"
+                WHERE fuel_id = {fuel_id} AND F_{additive_name} IS NOT NULL AND {component_name} IS NOT NULL
+                """
+            )
+        else:
+            query = (
+                f"""
+                SELECT F_fuel, F_{additive_name}, {component_name}
+                FROM "main"."experiments"
+                WHERE fuel_id = {fuel_id} AND F_{additive_name} IS NOT NULL AND {component_name} IS NOT NULL
+                """
+            )
         df = pd.read_sql(query, self.connection)
         if df.empty:
             raise ValueError(
