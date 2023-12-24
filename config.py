@@ -6,5 +6,8 @@ PATH_TO_EXCEL = os.path.join(DATA_DIR, "GUR_general_data.xlsx")
 PATH_TO_DB = os.path.join(DATA_DIR, "experiments.db")
 
 LISTS_TO_CONVERT_TO_KG_H = ['дт_воздух', 'дт_пар', 'нефть_пар', 'мазут_пар', 'Мазут_пар_2', 'мазут_воздух']
-COMPONENTS_TO_CONVERSATION_FROM_PPM_TO_MG_M3 = ['CO', 'NOx']  # Надо ли добавлять SO2?
+COMPONENTS_TO_CONVERSATION_FROM_PPM_TO_MG_M3 = ['CO', 'NOx']  # TODO Надо ли добавлять SO2?
 STANDARD_O2 = 3
+
+ADDITIVES = ['air', 'steam']
+MEASURING_COMPONENTS = ['O2', 'CO', 'NO', 'NO2', 'NOx', 'CO2', 'SO2']

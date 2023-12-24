@@ -1,7 +1,7 @@
 import pandas as pd
 
 from control.database import DatabaseHandler
-from config import COMPONENTS_TO_CONVERSATION_FROM_PPM_TO_MG_M3, STANDARD_O2
+from config import COMPONENTS_TO_CONVERSATION_FROM_PPM_TO_MG_M3, STANDARD_O2, MEASURING_COMPONENTS, ADDITIVES
 
 
 class ExperimentData:
@@ -50,6 +50,8 @@ class ExperimentData:
         if component_name in COMPONENTS_TO_CONVERSATION_FROM_PPM_TO_MG_M3:
             self.df = self.conversion_from_ppm_to_mg_m3(self.df)
 
+        self.averaging_duplicate_data()
+
     def conversion_from_ppm_to_mg_m3(self, df: pd.DataFrame) -> pd.DataFrame:
         """
         Метод, который переводит компоненты CO и NOx из ppm в мг/м3 по формуле:
@@ -69,3 +71,37 @@ class ExperimentData:
             df.drop(['O2', 'NO', 'NO2'], axis=1, inplace=True)
 
             return df
+
+    def get_all_available_variations(self) -> list[tuple]:
+        """
+        Метод, который возвращает все доступные комбинации топлива, добавочного компонента и компонента дымовых газов,
+        по которым можно построить карты режимов (имеются экспериментальные данные).
+        """
+        fuel_names = [fuel[1] for fuel in self.database.get_fuel_id_and_names()]
+        all_variants = [
+            (fuel_name, additive, component)
+            for fuel_name in fuel_names
+            for additive in ADDITIVES
+            for component in MEASURING_COMPONENTS
+        ]
+        available_variants = list()
+        for variant in all_variants:
+            try:
+                self.get_experiment_data(*variant)
+                available_variants.append(variant)
+            except ValueError:
+                continue
+        return available_variants
+
+    def averaging_duplicate_data(self):
+        """
+        Метод, который усредняет повторяющиеся значения экспериментальных данных, например:
+        [[Q_fuel, Q_air, CO]
+        [100, 100, 50],
+        [100, 100, 48]] ->
+        [[Q_fuel, Q_air, CO]
+        [100, 100, 49]]
+        """
+        df = self.df
+        df = df.groupby(["F_fuel", f"F_{self.additive_name}"])[f"{self.component_name}"].mean().reset_index()
+        self.df = df

@@ -1,8 +1,7 @@
-from control.database import DatabaseHandler
-from control.experiment import ExperimentData
-from config import PATH_TO_EXCEL
+from control.map import Map
+from control.experiment_data import ExperimentData
 
 if __name__ == '__main__':
-    ex = ExperimentData()
-    ex.get_experiment_data('diesel', 'steam', 'NOx')
+    m = Map()
+    m.save_all_source_map()
 
