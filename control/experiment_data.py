@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 from control.database import DatabaseHandler
 from config import COMPONENTS_TO_CONVERSATION_FROM_PPM_TO_MG_M3, STANDARD_O2, MEASURING_COMPONENTS, ADDITIVES
@@ -105,3 +106,48 @@ class ExperimentData:
         df = self.df
         df = df.groupby(["F_fuel", f"F_{self.additive_name}"])[f"{self.component_name}"].mean().reset_index()
         self.df = df
+
+    def get_df_in_matrix(self, df) -> tuple[list[float], list[float], np.array]:
+        """
+        Метод, который df переводит в матричный вид.
+        Например:
+        F_fuel F_additive Component
+        0 0 3
+        0 1 1
+        1 0 4
+        1 1 2 ->
+        [[1, 2], [3, 4]]
+        Returns:
+            tuple[list[float], list[float], np.array]: значения оси расхода топлива, добавочного компонента, и матрица
+            компонентов дымовых газов.
+        """
+        df = self.df
+        # Множество (set) для исключения из списка повторов
+        fuel_set = sorted(set(list(df["F_fuel"])))
+        additive_set = sorted(set(list(df[f"F_{self.additive_name}"])))
+
+        arr = np.empty((len(additive_set), len(fuel_set)))
+        arr[:] = np.nan
+
+        # Создаем словарь для того, чтобы запомнить положение элемента расхода (F_fuel, F_air/F_steam)
+        fuel_positions = dict()
+        for index, element in enumerate(fuel_set):
+            fuel_positions[element] = index
+
+        additive_positions = dict()
+        for index, element in enumerate(additive_set):
+            additive_positions[element] = index
+
+        for row in df.itertuples():
+            fuel_value = row[1]
+            add_value = row[2]
+            component_value = row[3]
+            # Узнаем из словаря порядок значения в списке для заполнения массива
+            arr_fuel_pos = fuel_positions[fuel_value]
+            arr_add_pos = additive_positions[add_value]
+
+            arr[arr_add_pos][arr_fuel_pos] = component_value
+
+        arr = np.flipud(arr)
+
+        return fuel_set, additive_set, arr
