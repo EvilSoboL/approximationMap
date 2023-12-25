@@ -93,8 +93,6 @@ class Map:
             for experiment_parameters in self.available_variations:
                 self.experiment_data.get_experiment_data(*experiment_parameters)
                 fuel_axis, additive_axis, component_matrix = self.experiment_data.get_df_in_matrix()
-                fuel_axis_str = [str(np.round(value, decimals=2)) for value in fuel_axis]
-                additive_axis_str = [str(np.round(value, decimals=2)) for value in additive_axis[::-1]]
 
                 df_component_matrix = pd.DataFrame(component_matrix, columns=fuel_axis, index=additive_axis[::-1])
 
