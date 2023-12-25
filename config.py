@@ -9,6 +9,8 @@ PATH_TO_DB = os.path.join(DATA_DIR, "experiments.db")
 
 PATH_TO_SOURCE_PLOT = os.path.join(PLOT_DIR, "source")
 
+PATH_TO_EXCEL_RESULT = os.path.join(BASE_DIR, "excel_results")
+
 LISTS_TO_CONVERT_TO_KG_H = ['дт_воздух', 'дт_пар', 'нефть_пар', 'мазут_пар', 'Мазут_пар_2', 'мазут_воздух']
 COMPONENTS_TO_CONVERSATION_FROM_PPM_TO_MG_M3 = ['CO', 'NOx']  # TODO Надо ли добавлять SO2?
 STANDARD_O2 = 3

@@ -1,10 +1,11 @@
 import os
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 from control.experiment_data import ExperimentData
 from control.database import DatabaseHandler
-from config import PATH_TO_SOURCE_PLOT
+from config import PATH_TO_SOURCE_PLOT, PATH_TO_EXCEL_RESULT
 
 
 class Map:
@@ -78,8 +79,26 @@ class Map:
             if not os.path.exists(PATH_TO_SOURCE_PLOT):
                 os.mkdir(PATH_TO_SOURCE_PLOT)
             plt.savefig(
-                PATH_TO_SOURCE_PLOT + f'/{self.experiment_data.fuel_name}_{self.experiment_data.additive_name}_{self.experiment_data.component_name}.png'
+                PATH_TO_SOURCE_PLOT + f"/{self.experiment_data.fuel_name}_{self.experiment_data.additive_name}_{self.experiment_data.component_name}.png"
             )
             plt.close()
 
+    def save_all_source_map_to_excel(self):
+        """
+        Метод, который сохраняет результаты экспериментов в виде матрицы в excel.
+        """
+        if not os.path.exists(PATH_TO_EXCEL_RESULT):
+            os.mkdir(PATH_TO_EXCEL_RESULT)
+        with pd.ExcelWriter(PATH_TO_EXCEL_RESULT + "/source.xlsx") as writer:
+            for experiment_parameters in self.available_variations:
+                self.experiment_data.get_experiment_data(*experiment_parameters)
+                fuel_axis, additive_axis, component_matrix = self.experiment_data.get_df_in_matrix()
+                fuel_axis_str = [str(np.round(value, decimals=2)) for value in fuel_axis]
+                additive_axis_str = [str(np.round(value, decimals=2)) for value in additive_axis[::-1]]
 
+                df_component_matrix = pd.DataFrame(component_matrix, columns=fuel_axis, index=additive_axis[::-1])
+
+                sheet_name = f"{self.experiment_data.fuel_name}_{self.experiment_data.additive_name}_{self.experiment_data.component_name}"
+
+                self.experiment_data.df.to_excel(writer, sheet_name=sheet_name)
+                df_component_matrix.to_excel(writer, sheet_name=sheet_name, startcol=6)

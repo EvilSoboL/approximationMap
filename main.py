@@ -3,5 +3,5 @@ from control.experiment_data import ExperimentData
 
 if __name__ == '__main__':
     m = Map()
-    m.save_all_source_map()
+    m.save_all_source_map_to_excel()
 
