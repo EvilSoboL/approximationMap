@@ -5,7 +5,10 @@ import pandas as pd
 
 from control.experiment_data import ExperimentData
 from control.database import DatabaseHandler
-from config import PATH_TO_SOURCE_PLOT, PATH_TO_EXCEL_RESULT
+from config import (PATH_TO_SOURCE_PLOT,
+                    PATH_TO_EXCEL_RESULT,
+                    COMPONENTS_TO_CONVERSATION_FROM_PPM_TO_MG_M3,
+                    PATH_TO_RBF_PLOT)
 
 
 class Map:
@@ -109,7 +112,62 @@ class Map:
         for experiment_parameters in self.available_variations:
             self.experiment_data.get_experiment_data(*experiment_parameters)
             fuel_axis, additive_axis, approximated_component_surface = self.experiment_data.get_rbf_data()
+
+            fig, ax = plt.subplots(figsize=(16, 9))
+
             plt.contourf(fuel_axis, additive_axis, approximated_component_surface)
-            plt.show()
-            break
+
+            # Название графика
+            if self.experiment_data.component_name == 'O2':
+                plt.title(r"Rbf(linear)+med.filter+non negative: $O_2$")
+
+            elif self.experiment_data.component_name == 'CO':
+                plt.title(r"Rbf(linear)+med.filter+non negative: $CO$")
+
+            elif self.experiment_data.component_name == 'NO':
+                plt.title(r"Rbf(linear)+med.filter+non negative: $NO$")
+
+            elif self.experiment_data.component_name == 'NO2':
+                plt.title(r"Rbf(linear)+med.filter+non negative: $NO_2$")
+
+            elif self.experiment_data.component_name == 'NOx':
+                plt.title(r"Rbf(linear)+med.filter+non negative: $NO_X$")
+
+            elif self.experiment_data.component_name == 'CO2':
+                plt.title(r"Rbf(linear)+med.filter+non negative: $CO_2$")
+
+            elif self.experiment_data.component_name == 'SO2':
+                plt.title(r"Rbf(linear)+med.filter+non negative: $SO_2$")
+
+            # Подписи осей
+            if self.experiment_data.fuel_name == 'waste_oil':
+                ax.set_xlabel(r"$F_{\text{waste oil}}$, kg/h")
+
+            elif self.experiment_data.fuel_name == 'crude_oil':
+                ax.set_xlabel(r"$F_{\text{crude oil}}$, kg/h")
+
+            elif self.experiment_data.fuel_name == 'heavy_oil':
+                ax.set_xlabel(r"$F_{\text{heavy oil}}$, kg/h")
+
+            else:
+                ax.set_xlabel(f"$F_{{{self.experiment_data.fuel_name}}}$, kg/h")
+            ax.set_ylabel(f"$F_{{{self.experiment_data.additive_name}}}$, kg/h")
+
+            # Подпись цветовых значений
+            clb = plt.colorbar()
+            if self.experiment_data.component_name in ["O2", "CO2"]:
+                clb.ax.set_title(r"vol.%")
+            elif self.experiment_data.component_name in COMPONENTS_TO_CONVERSATION_FROM_PPM_TO_MG_M3:
+                clb.ax.set_title(r"$mg/m^3$")
+            else:
+                clb.ax.set_title("ppm")
+
+            plt.tight_layout()
+
+            if not os.path.exists(PATH_TO_RBF_PLOT):
+                os.mkdir(PATH_TO_RBF_PLOT)
+            plt.savefig(
+                PATH_TO_RBF_PLOT + f"/{self.experiment_data.fuel_name}_{self.experiment_data.additive_name}_{self.experiment_data.component_name}.png"
+            )
+            plt.close()
 

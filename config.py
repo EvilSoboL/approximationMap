@@ -8,6 +8,7 @@ PATH_TO_EXCEL = os.path.join(DATA_DIR, "GUR_general_data.xlsx")
 PATH_TO_DB = os.path.join(DATA_DIR, "experiments.db")
 
 PATH_TO_SOURCE_PLOT = os.path.join(PLOT_DIR, "source")
+PATH_TO_RBF_PLOT = os.path.join(PLOT_DIR, "Rbf(linear)+med.filter(20)+non negative")
 
 PATH_TO_EXCEL_RESULT = os.path.join(BASE_DIR, "excel_results")
 
