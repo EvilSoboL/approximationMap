@@ -100,3 +100,16 @@ class Map:
 
                 self.experiment_data.df.to_excel(writer, sheet_name=sheet_name)
                 df_component_matrix.to_excel(writer, sheet_name=sheet_name, startcol=6)
+
+    def save_all_rbf_map(self):
+        """
+        Метод, который сохраняет аппроксимативные карты, созданные с помощью RbfInterpolator(linear), с удаленными
+        отрицательными значениями и применением медианного фильтра.
+        """
+        for experiment_parameters in self.available_variations:
+            self.experiment_data.get_experiment_data(*experiment_parameters)
+            fuel_axis, additive_axis, approximated_component_surface = self.experiment_data.get_rbf_data()
+            plt.contourf(fuel_axis, additive_axis, approximated_component_surface)
+            plt.show()
+            break
+

@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+from scipy.interpolate import RBFInterpolator
+from scipy.ndimage import median_filter
 
 from control.database import DatabaseHandler
 from config import COMPONENTS_TO_CONVERSATION_FROM_PPM_TO_MG_M3, STANDARD_O2, MEASURING_COMPONENTS, ADDITIVES
@@ -151,3 +153,50 @@ class ExperimentData:
         arr = np.flipud(arr)
 
         return fuel_set, additive_set, arr
+
+    def get_rbf_data(self) -> tuple[np.array, np.array, np.array]:
+        """
+        Метод, который используется для получения аппроксимированной поверхности с помощью класса scipy.RbfInterpolator
+        с разрешением 100 единиц, применением медианного фильтра и удалением отрицательных значений.
+
+        Returns:
+            fuel_axis_extended.ravel() - значения оси расхода топлива увеличенные на число разрешения,
+            additive_axis_extended.ravel() - значения оси расхода добавочного компонента увеличенные на число разрешения,
+            approximated_component_surface - аппроксимированная поверхность добавочного компонента.
+        """
+        df = self.df
+
+        fuel_axis = np.array(df["F_fuel"])
+        additive_axis = np.array(df[f"F_{self.additive_name}"])
+        component_axis = np.array(df[f"{self.component_name}"])
+
+        fuel_axis = fuel_axis.reshape(len(fuel_axis), 1)
+        additive_axis = additive_axis.reshape(len(additive_axis), 1)
+
+        fuel_additive_axis = np.concatenate((fuel_axis, additive_axis), axis=1)
+
+        rbfi = RBFInterpolator(fuel_additive_axis, component_axis, kernel='linear')
+
+        fuel_step = (fuel_axis.max() - fuel_axis.min()) / 100
+        additive_step = (additive_axis.max() - additive_axis.min()) / 100
+
+        fuel_axis_extended = np.arange(fuel_axis.min(), fuel_axis.max(), fuel_step)
+        additive_axis_extended = np.arange(additive_axis.min(), additive_axis.max(), additive_step)
+
+        fuel_grid, additive_grid = np.meshgrid(fuel_axis_extended, additive_axis_extended)
+
+        fuel_additive_grid = np.stack([fuel_grid.ravel(), additive_grid.ravel()], -1)
+
+        approximated_component_surface = rbfi(fuel_additive_grid).reshape(fuel_grid.shape)
+
+        # Переворачиваем массив с ног на голову
+        approximated_component_surface = np.flipud(approximated_component_surface)
+        additive_axis_extended = additive_axis_extended.ravel()[::-1]  # Переворачиваем ось y с ног на голову
+
+        # Удаление отрицательных значений из интерполяционной поверхности
+        approximated_component_surface[approximated_component_surface < 0] = 0
+
+        # Применение медианного фильтра
+        approximated_component_surface = median_filter(approximated_component_surface, size=20)
+
+        return fuel_axis_extended.ravel(), additive_axis_extended.ravel(), approximated_component_surface
