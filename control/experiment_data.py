@@ -107,7 +107,7 @@ class ExperimentData:
         df = df.groupby(["F_fuel", f"F_{self.additive_name}"])[f"{self.component_name}"].mean().reset_index()
         self.df = df
 
-    def get_df_in_matrix(self, df) -> tuple[list[float], list[float], np.array]:
+    def get_df_in_matrix(self) -> tuple[list[float], list[float], np.array]:
         """
         Метод, который df переводит в матричный вид.
         Например:
