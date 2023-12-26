@@ -69,7 +69,7 @@ class ExperimentData:
 
             return df
         else:
-            # TODO Что делать с NaN значениями?
+            # TODO Что делать с NaN значениями? Из-за этого возникает баг при отображении аппроксимированной карты NOx
             df['NOx'] = ((21 - STANDARD_O2)/(21 - df['O2']))*2.05*(df['NO'] + df['NO2'])
             df.drop(['O2', 'NO', 'NO2'], axis=1, inplace=True)
 
@@ -200,3 +200,35 @@ class ExperimentData:
         approximated_component_surface = median_filter(approximated_component_surface, size=20)
 
         return fuel_axis_extended.ravel(), additive_axis_extended.ravel(), approximated_component_surface
+
+    def convert_approximated_surface_to_df(
+            self,
+            fuel_axis: np.array,
+            additive_axis: np.array,
+            approximated_surface: np.array
+    ) -> pd.DataFrame:
+        """
+        Метод, который на вход принимает интерполяционную поверхность и возвращает её в виде таблицы со
+        значениями Q_fuel, Q_additive, component
+
+        Args:
+            fuel_axis - значения оси расхода топлива,
+            additive_axis - значения оси расхода добавочного компонента,
+            approximated_surface - аппроксимированная поверхность добавочного компонента.
+        """
+        approximated_surface_flat = approximated_surface.flatten()  # Плоское представление матрицы z_interp
+
+        fuel_axis_flat = list()
+        additive_axis_flat = list()
+        approximated_surface_flat = list(approximated_surface_flat)
+
+        for additive_value in additive_axis:
+            for fuel_value in fuel_axis:
+                fuel_axis_flat.append(fuel_value), additive_axis_flat.append(additive_value)
+
+        converted_df = pd.DataFrame(
+            {"F_fuel": fuel_axis_flat,
+             f"F_{self.additive_name}": additive_axis_flat,
+             f"{self.component_name}": approximated_surface_flat})
+
+        return converted_df

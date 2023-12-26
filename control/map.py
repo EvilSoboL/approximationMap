@@ -115,7 +115,7 @@ class Map:
 
             fig, ax = plt.subplots(figsize=(16, 9))
 
-            plt.contourf(fuel_axis, additive_axis, approximated_component_surface)
+            plt.contourf(fuel_axis, additive_axis, approximated_component_surface)  # TODO custom colormap
 
             # Название графика
             if self.experiment_data.component_name == 'O2':
@@ -171,3 +171,25 @@ class Map:
             )
             plt.close()
 
+    def save_all_rbd_map_to_excel(self):
+        """
+        Метод, который сохраняет аппроксимируемые поверхности РБФ в excel.
+        """
+        if not os.path.exists(PATH_TO_EXCEL_RESULT):
+            os.mkdir(PATH_TO_EXCEL_RESULT)
+        with pd.ExcelWriter(PATH_TO_EXCEL_RESULT + "/Rbf(linear)+med.filter+non_negative.xlsx") as writer:
+            for experiment_parameters in self.available_variations:
+                self.experiment_data.get_experiment_data(*experiment_parameters)
+                fuel_axis, additive_axis, approximated_component_surface = self.experiment_data.get_rbf_data()
+
+                df_component_matrix = pd.DataFrame(
+                    approximated_component_surface, columns=fuel_axis, index=additive_axis[::-1]
+                )
+                converted_df = self.experiment_data.convert_approximated_surface_to_df(
+                    fuel_axis, additive_axis, approximated_component_surface
+                )
+
+                sheet_name = f"{self.experiment_data.fuel_name}_{self.experiment_data.additive_name}_{self.experiment_data.component_name}"
+
+                converted_df.to_excel(writer, sheet_name=sheet_name)
+                df_component_matrix.to_excel(writer, sheet_name=sheet_name, startcol=6)
