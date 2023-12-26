@@ -13,7 +13,7 @@ PATH_TO_RBF_PLOT = os.path.join(PLOT_DIR, "Rbf(linear)+med.filter(20)+non negati
 PATH_TO_EXCEL_RESULT = os.path.join(BASE_DIR, "excel_results")
 
 LISTS_TO_CONVERT_TO_KG_H = ['дт_воздух', 'дт_пар', 'нефть_пар', 'мазут_пар', 'Мазут_пар_2', 'мазут_воздух']
-COMPONENTS_TO_CONVERSATION_FROM_PPM_TO_MG_M3 = ['CO', 'NOx']  # TODO Надо ли добавлять SO2?
+COMPONENTS_TO_CONVERSATION_FROM_PPM_TO_MG_M3 = ['CO', 'NOx']
 STANDARD_O2 = 3
 
 ADDITIVES = ['air', 'steam']

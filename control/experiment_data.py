@@ -69,8 +69,8 @@ class ExperimentData:
 
             return df
         else:
-            # TODO Что делать с NaN значениями? Из-за этого возникает баг при отображении аппроксимированной карты NOx
             df['NOx'] = ((21 - STANDARD_O2)/(21 - df['O2']))*2.05*(df['NO'] + df['NO2'])
+            df.dropna(subset=['NOx'], inplace=True)  # Удаление отрицательных значений
             df.drop(['O2', 'NO', 'NO2'], axis=1, inplace=True)
 
             return df
