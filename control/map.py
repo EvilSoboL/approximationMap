@@ -116,8 +116,9 @@ class Map:
 
             fig, ax = plt.subplots(figsize=(16, 9))
             plt.rcParams.update({'font.size': 18})
+            ax.tick_params(axis='both', which='both', labelsize=18)
 
-            plt.contourf(fuel_axis, additive_axis, approximated_component_surface)  # TODO custom colormap
+            plt.contourf(fuel_axis, additive_axis, approximated_component_surface)
 
             # Название графика
             if self.experiment_data.component_name == 'O2':
@@ -152,10 +153,10 @@ class Map:
                 ax.set_xlabel(r"$F_{\text{heavy oil}}$, kg/h")
 
             else:
-                ax.set_xlabel(f"$F_{{{self.experiment_data.fuel_name}}}$, kg/h")
-            ax.set_ylabel(f"$F_{{{self.experiment_data.additive_name}}}$, kg/h")
+                ax.set_xlabel(f"$F_{{{self.experiment_data.fuel_name}}}$, kg/h", fontsize=18)
+            ax.set_ylabel(f"$F_{{{self.experiment_data.additive_name}}}$, kg/h", fontsize=18)
 
-            # Подпись цветовых значений
+            # Подпись colorbar
             clb = plt.colorbar()
             if self.experiment_data.component_name in ["O2", "CO2"]:
                 clb.ax.set_title(r"vol.%")
