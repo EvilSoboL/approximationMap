@@ -177,11 +177,13 @@ class ExperimentData:
 
         rbfi = RBFInterpolator(fuel_additive_axis, component_axis, kernel='linear')
 
-        fuel_step = (fuel_axis.max() - fuel_axis.min()) / 100
-        additive_step = (additive_axis.max() - additive_axis.min()) / 100
+        min_max_dict = self.get_minimum_and_maximum_consumption()
 
-        fuel_axis_extended = np.arange(fuel_axis.min(), fuel_axis.max(), fuel_step)
-        additive_axis_extended = np.arange(additive_axis.min(), additive_axis.max(), additive_step)
+        fuel_step = (min_max_dict['F_fuel'][1] - min_max_dict['F_fuel'][0]) / 100
+        additive_step = (min_max_dict['F_additive'][1] - min_max_dict['F_additive'][0]) / 100
+
+        fuel_axis_extended = np.arange(min_max_dict['F_fuel'][0], min_max_dict['F_fuel'][1], fuel_step)
+        additive_axis_extended = np.arange(min_max_dict['F_additive'][0], min_max_dict['F_additive'][1], additive_step)
 
         fuel_grid, additive_grid = np.meshgrid(fuel_axis_extended, additive_axis_extended)
 
