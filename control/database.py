@@ -171,3 +171,25 @@ class DatabaseHandler:
             )
 
         return df
+
+    def get_minimum_and_maximum_consumption(self) -> dict:
+        """
+        Метод, который возвращает словарь с минимальными и максимальными значениями расхода топлива, добавочного воздуха
+        и добавочного пара.
+        """
+        with self.connection:
+            self.cursor.execute(
+                """
+                SELECT MIN(F_fuel) AS min_fuel, MAX(F_fuel) AS max_fuel,
+                       MIN(F_air) AS min_air, MAX(F_air) AS max_air,
+                       MIN(F_steam) AS min_steam, MAX(F_steam) AS max_steam
+            FROM "main"."experiments"
+            """
+            )
+            result = self.cursor.fetchone()
+            result_dict = {
+                'F_fuel': (result[0], result[1]),
+                'F_air': (result[2], result[3]),
+                'F_steam': (result[4], result[5])
+            }
+        return result_dict

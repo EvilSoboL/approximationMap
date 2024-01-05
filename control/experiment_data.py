@@ -232,3 +232,21 @@ class ExperimentData:
              f"{self.component_name}": approximated_surface_flat})
 
         return converted_df
+
+    def get_minimum_and_maximum_consumption(self) -> dict:
+        """
+        Метод, который возвращает словарь минимальных и максимальных значений для расхода топлива и добавочных компонентов.
+        """
+        min_max_dict = self.database.get_minimum_and_maximum_consumption()
+        f_air_values = min_max_dict['F_air']
+        f_steam_values = min_max_dict['F_steam']
+
+        min_additive_value = min(f_air_values[0], f_steam_values[0])
+        max_additive_value = max(f_air_values[1], f_steam_values[1])
+
+        min_max_dict['F_additive'] = (min_additive_value, max_additive_value)
+
+        min_max_dict.pop('F_air')
+        min_max_dict.pop('F_steam')
+
+        return min_max_dict

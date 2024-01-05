@@ -28,6 +28,7 @@ class Map:
             additive_axis_str = [str(np.round(value, decimals=2)) for value in additive_axis[::-1]]
 
             fig, ax = plt.subplots(figsize=(16, 9))
+            plt.rcParams.update({'font.size': 18})
 
             ax.matshow(component_matrix)
 
@@ -114,6 +115,7 @@ class Map:
             fuel_axis, additive_axis, approximated_component_surface = self.experiment_data.get_rbf_data()
 
             fig, ax = plt.subplots(figsize=(16, 9))
+            plt.rcParams.update({'font.size': 18})
 
             plt.contourf(fuel_axis, additive_axis, approximated_component_surface)  # TODO custom colormap
 
@@ -166,6 +168,7 @@ class Map:
 
             if not os.path.exists(PATH_TO_RBF_PLOT):
                 os.mkdir(PATH_TO_RBF_PLOT)
+
             plt.savefig(
                 PATH_TO_RBF_PLOT + f"/{self.experiment_data.fuel_name}_{self.experiment_data.additive_name}_{self.experiment_data.component_name}.png"
             )
