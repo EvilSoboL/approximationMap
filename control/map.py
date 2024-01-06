@@ -94,6 +94,7 @@ class Map:
         if not os.path.exists(PATH_TO_EXCEL_RESULT):
             os.mkdir(PATH_TO_EXCEL_RESULT)
         with pd.ExcelWriter(PATH_TO_EXCEL_RESULT + "/source.xlsx") as writer:
+            # Сохранение карт в ppm
             for experiment_parameters in self.available_variations:
                 self.experiment_data.get_experiment_data(*experiment_parameters)
                 fuel_axis, additive_axis, component_matrix = self.experiment_data.get_df_in_matrix()
@@ -105,6 +106,19 @@ class Map:
                 self.experiment_data.df.to_excel(writer, sheet_name=sheet_name)
                 df_component_matrix.to_excel(writer, sheet_name=sheet_name, startcol=6)
 
+            # Сохранение карт в mg/m3
+            for experiment_parameters in self.available_variations:
+                if experiment_parameters[2] in COMPONENTS_TO_CONVERSATION_FROM_PPM_TO_MG_M3:
+                    self.experiment_data.get_experiment_data(*experiment_parameters, convert_to_mg_m3=True)
+                    fuel_axis, additive_axis, component_matrix = self.experiment_data.get_df_in_matrix()
+
+                    df_component_matrix = pd.DataFrame(component_matrix, columns=fuel_axis, index=additive_axis[::-1])
+
+                    sheet_name = f"{self.experiment_data.fuel_name}_{self.experiment_data.additive_name}_{self.experiment_data.component_name}_mg_m3"
+
+                    self.experiment_data.df.to_excel(writer, sheet_name=sheet_name)
+                    df_component_matrix.to_excel(writer, sheet_name=sheet_name, startcol=6)
+
     def save_all_rbf_map(self):
         """
         Метод, который сохраняет аппроксимативные карты, созданные с помощью RbfInterpolator(linear), с удаленными
@@ -112,7 +126,6 @@ class Map:
         """
         # Сохранение карт в ppm
         for experiment_parameters in self.available_variations:
-            break
             self.experiment_data.get_experiment_data(*experiment_parameters)
             fuel_axis, additive_axis, approximated_component_surface = self.experiment_data.get_rbf_data()
 
@@ -217,9 +230,6 @@ class Map:
                     PATH_TO_RBF_PLOT + f"/{self.experiment_data.fuel_name}_{self.experiment_data.additive_name}_{self.experiment_data.component_name}_mg_m3.png"
                 )
                 plt.close()
-
-
-
 
     def save_all_rbd_map_to_excel(self):
         """
