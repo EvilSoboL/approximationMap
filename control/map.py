@@ -110,7 +110,9 @@ class Map:
         Метод, который сохраняет аппроксимативные карты, созданные с помощью RbfInterpolator(linear), с удаленными
         отрицательными значениями и применением медианного фильтра.
         """
+        # Сохранение карт в ppm
         for experiment_parameters in self.available_variations:
+            break
             self.experiment_data.get_experiment_data(*experiment_parameters)
             fuel_axis, additive_axis, approximated_component_surface = self.experiment_data.get_rbf_data()
 
@@ -160,8 +162,6 @@ class Map:
             clb = plt.colorbar()
             if self.experiment_data.component_name in ["O2", "CO2"]:
                 clb.ax.set_title(r"vol.%")
-            elif self.experiment_data.component_name in COMPONENTS_TO_CONVERSATION_FROM_PPM_TO_MG_M3:
-                clb.ax.set_title(r"$mg/m^3$")
             else:
                 clb.ax.set_title("ppm")
 
@@ -174,6 +174,52 @@ class Map:
                 PATH_TO_RBF_PLOT + f"/{self.experiment_data.fuel_name}_{self.experiment_data.additive_name}_{self.experiment_data.component_name}.png"
             )
             plt.close()
+        # Сохранение карт в mg/m3
+        for experiment_parameters in self.available_variations:
+            if experiment_parameters[2] in COMPONENTS_TO_CONVERSATION_FROM_PPM_TO_MG_M3:
+                self.experiment_data.get_experiment_data(*experiment_parameters, convert_to_mg_m3=True)
+                fuel_axis, additive_axis, approximated_component_surface = self.experiment_data.get_rbf_data()
+
+                fig, ax = plt.subplots(figsize=(16, 9))
+                plt.rcParams.update({'font.size': 18})
+                ax.tick_params(axis='both', which='both', labelsize=18)
+
+                plt.contourf(fuel_axis, additive_axis, approximated_component_surface)
+
+                # Название графика
+                if self.experiment_data.component_name == 'CO':
+                    plt.title(r"Rbf(linear)+med.filter+non negative: $CO$")
+
+                elif self.experiment_data.component_name == 'NOx':
+                    plt.title(r"Rbf(linear)+med.filter+non negative: $NO_X$")
+
+                # Подписи осей
+                if self.experiment_data.fuel_name == 'waste_oil':
+                    ax.set_xlabel(r"$F_{\text{waste oil}}$, kg/h")
+
+                elif self.experiment_data.fuel_name == 'crude_oil':
+                    ax.set_xlabel(r"$F_{\text{crude oil}}$, kg/h")
+
+                elif self.experiment_data.fuel_name == 'heavy_oil':
+                    ax.set_xlabel(r"$F_{\text{heavy oil}}$, kg/h")
+
+                else:
+                    ax.set_xlabel(f"$F_{{{self.experiment_data.fuel_name}}}$, kg/h", fontsize=18)
+                ax.set_ylabel(f"$F_{{{self.experiment_data.additive_name}}}$, kg/h", fontsize=18)
+
+                # Подпись colorbar
+                clb = plt.colorbar()
+                clb.ax.set_title(r"$mg/m^3$")
+
+                plt.tight_layout()
+
+                plt.savefig(
+                    PATH_TO_RBF_PLOT + f"/{self.experiment_data.fuel_name}_{self.experiment_data.additive_name}_{self.experiment_data.component_name}_mg_m3.png"
+                )
+                plt.close()
+
+
+
 
     def save_all_rbd_map_to_excel(self):
         """

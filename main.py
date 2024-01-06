@@ -9,5 +9,3 @@ if __name__ == '__main__':
 
     m.save_all_rbf_map()
     #print(ex.get_rbf_data())
-
-
