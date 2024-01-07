@@ -282,13 +282,14 @@ class Map:
                 )
                 plt.close()
 
-    def save_all_rbd_map_to_excel(self):
+    def save_all_rbf_map_to_excel(self):
         """
         Метод, который сохраняет аппроксимируемые поверхности РБФ в excel.
         """
         if not os.path.exists(PATH_TO_EXCEL_RESULT):
             os.mkdir(PATH_TO_EXCEL_RESULT)
         with pd.ExcelWriter(PATH_TO_EXCEL_RESULT + "/Rbf(linear)+med.filter+non_negative.xlsx") as writer:
+            # Сохранение карт в ppm
             for experiment_parameters in self.available_variations:
                 self.experiment_data.get_experiment_data(*experiment_parameters)
                 fuel_axis, additive_axis, approximated_component_surface = self.experiment_data.get_rbf_data()
@@ -304,3 +305,21 @@ class Map:
 
                 converted_df.to_excel(writer, sheet_name=sheet_name)
                 df_component_matrix.to_excel(writer, sheet_name=sheet_name, startcol=6)
+
+            # Сохранение карт в мг/м3
+            for experiment_parameters in self.available_variations:
+                if experiment_parameters[2] in COMPONENTS_TO_CONVERSATION_FROM_PPM_TO_MG_M3:
+                    self.experiment_data.get_experiment_data(*experiment_parameters, convert_to_mg_m3=True)
+                    fuel_axis, additive_axis, approximated_component_surface = self.experiment_data.get_rbf_data()
+
+                    df_component_matrix = pd.DataFrame(
+                        approximated_component_surface, columns=fuel_axis, index=additive_axis[::-1]
+                    )
+                    converted_df = self.experiment_data.convert_approximated_surface_to_df(
+                        fuel_axis, additive_axis, approximated_component_surface
+                    )
+
+                    sheet_name = f"{self.experiment_data.fuel_name}_{self.experiment_data.additive_name}_{self.experiment_data.component_name}_mg_m3"
+
+                    converted_df.to_excel(writer, sheet_name=sheet_name)
+                    df_component_matrix.to_excel(writer, sheet_name=sheet_name, startcol=6)
