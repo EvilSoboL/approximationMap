@@ -7,5 +7,5 @@ if __name__ == '__main__':
     ex = ExperimentData()
     m = Map()
 
-    m.save_all_source_map_to_excel()
+    m.save_all_source_map()
     #print(ex.get_rbf_data())
