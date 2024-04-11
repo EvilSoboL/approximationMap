@@ -207,3 +207,17 @@ class DatabaseHandler:
                     SET {component_with_zeroes} = NULL WHERE {component_with_zeroes} = 0.0;
                     """
                 )
+
+    def get_all_experiment_data(self) -> pd.DataFrame:
+        with self.connection:
+            self.cursor.execute(
+                """
+                SELECT * 
+                FROM "main"."experiments" 
+                """
+            )
+        data = self.cursor.fetchall()
+        column_names = [desc[0] for desc in self.cursor.description]
+
+        return pd.DataFrame(data, columns=column_names)
+
