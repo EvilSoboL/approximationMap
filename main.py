@@ -10,14 +10,15 @@ if __name__ == '__main__':
     ex = ExperimentData()
     m = Map()
     upl = ApproximatedMapUploader()
-    ex.get_co_min_equations()
-    print(ex.co_equation_dict)
-    '''
+
+    m.save_all_source_map()
     m.save_all_source_map_to_excel()
+
     m.save_all_rbf_map()
     m.save_all_rbf_map_to_excel()
+
     m.save_all_co_min_map()
     m.save_all_o2_min_map()
-    '''
+
 
 
