@@ -221,3 +221,17 @@ class DatabaseHandler:
 
         return pd.DataFrame(data, columns=column_names)
 
+    def get_flame_height_data(self) -> pd.DataFrame:
+        with self.connection:
+            self.cursor.execute(
+                """
+                SELECT *
+                FROM "main"."experiments"
+                WHERE flame_height IS NOT NULL
+                """
+            )
+        data = self.cursor.fetchall()
+        column_names = [desc[0] for desc in self.cursor.description]
+
+        return pd.DataFrame(data, columns=column_names)
+

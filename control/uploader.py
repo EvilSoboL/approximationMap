@@ -2,6 +2,7 @@ import pandas as pd
 import os
 
 from control.experiment_data import ExperimentData
+from control.database import DatabaseHandler
 from config import DATA_RES_DIR
 
 
@@ -29,3 +30,13 @@ class ApproximatedMapUploader:
         for key, value in surfaces_dict.items():
             path_to_save = os.path.join(DATA_RES_DIR, f'{key}.csv')
             value.to_csv(path_to_save, index=False)
+
+
+class FlameHeightUploader:
+    """Класс для получения csv файла со значениями высот пламени"""
+    def __init__(self):
+        self.database = DatabaseHandler()
+
+    def save_to_csv(self, path_to_save) -> None:
+        df = self.database.get_flame_height_data()
+        df.to_csv(path_to_save, index=False)
