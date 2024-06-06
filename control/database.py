@@ -225,7 +225,7 @@ class DatabaseHandler:
         with self.connection:
             self.cursor.execute(
                 """
-                SELECT *
+                SELECT F_fuel, F_steam, flame_height
                 FROM "main"."experiments"
                 WHERE flame_height IS NOT NULL
                 """
@@ -235,3 +235,18 @@ class DatabaseHandler:
 
         return pd.DataFrame(data, columns=column_names)
 
+    def get_gas_analysis(self, fuel_id: int, additive_type: str) -> pd.DataFrame:
+        if additive_type == 'air' or additive_type == 'steam':
+            Warning('Вводимый компонент должен быть steam или air!')
+        with self.connection:
+            self.cursor.execute(
+                f"""
+                SELECT F_fuel, F_{additive_type}, O2, CO, NO, NO2, NOx, CO2, SO2, P_{additive_type}, t_wg
+                FROM "main"."experiments"
+                WHERE fuel_id = {fuel_id} AND F_{additive_type} AND CO IS NOT NULL
+                """
+            )
+        data = self.cursor.fetchall()
+        column_names = [desc[0] for desc in self.cursor.description]
+
+        return pd.DataFrame(data, columns=column_names)

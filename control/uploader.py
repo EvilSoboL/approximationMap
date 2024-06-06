@@ -37,6 +37,16 @@ class FlameHeightUploader:
     def __init__(self):
         self.database = DatabaseHandler()
 
-    def save_to_csv(self, path_to_save) -> None:
+    def save_to_csv(self, path_to_save: str) -> None:
         df = self.database.get_flame_height_data()
+        df.to_csv(path_to_save, index=False)
+
+
+class GetExperimentData:
+    """Класс для получения csv файла со результатами экспериментальных данных"""
+    def __init__(self):
+        self.database = DatabaseHandler()
+
+    def save_experiment_data_to_csv(self, path_to_save: str, fuel_type: int, additive_type: str) -> None:
+        df = self.database.get_gas_analysis(fuel_type, additive_type)
         df.to_csv(path_to_save, index=False)
