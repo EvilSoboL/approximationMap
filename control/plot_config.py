@@ -15,15 +15,16 @@ def save_source_plot(
     fig, ax = plt.subplots(figsize=(16, 9))
     plt.rcParams.update({'font.size': 18})
 
-    sns.heatmap(component_matrix, linewidths=1.5, annot=True, fmt='g', ax=ax)
+    sns.heatmap(component_matrix, linewidths=1.5, annot=True, fmt='g', ax=ax, cbar=False, cmap='Greys')
+
 
     # Название графика
     if ppm:
         if component_name == 'O2':
             plt.title(r"Source: $O_2$, vol.%")
 
-        elif component_name == 'CO':
-            plt.title(r"Source: $CO, ppm$")
+        #elif component_name == 'CO':
+            #plt.title(r"Source: $CO, ppm$")
 
         elif component_name == 'NO':
             plt.title(r"Source: $NO$, ppm")
@@ -60,8 +61,8 @@ def save_source_plot(
         ax.set_xlabel(r"$F_{\text{heavy oil}}$, kg/h")
 
     else:
-        ax.set_xlabel(f"$F_{{{fuel_name}}}$, kg/h")
-    ax.set_ylabel(f"$F_{{{additive_name}}}$, kg/h")
+        ax.set_xlabel('fuel consumption, kg/h')
+    ax.set_ylabel('additive consumption, kg/h')
 
     plt.tight_layout()
 

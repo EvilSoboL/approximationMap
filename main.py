@@ -15,13 +15,14 @@ if __name__ == '__main__':
     flame = FlameHeightUploader()
     gas_analysis = GetExperimentData()
 
-    flame.save_to_csv(os.path.join(DATA_RES_DIR, 'diesel_steam_flame_height.csv'))
-    gas_analysis.save_experiment_data_to_csv(
-        os.path.join(DATA_RES_DIR, 'diesel_steam_gas_analysis.csv'),
-        1,
-        'steam')
+    #flame.save_to_csv(os.path.join(DATA_RES_DIR, 'diesel_steam_flame_height.csv'))
+    #gas_analysis.save_experiment_data_to_csv(
+    #    os.path.join(DATA_RES_DIR, 'diesel_steam_gas_analysis.csv'),
+    #    1,
+    #    'steam')
 
     #m.save_all_source_map_to_excel()
+    m.save_all_source_map()
 
     #m.save_all_rbf_map()
     #m.save_all_rbf_map_to_excel()
