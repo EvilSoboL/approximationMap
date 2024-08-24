@@ -15,7 +15,7 @@ def save_source_plot(
     fig, ax = plt.subplots(figsize=(16, 9))
     plt.rcParams.update({'font.size': 18})
 
-    sns.heatmap(component_matrix, linewidths=1.5, annot=True, fmt='g', ax=ax, cbar=False, cmap='Greys')
+    sns.heatmap(component_matrix, linewidths=1.5, annot=True, fmt='.0f', ax=ax, cbar=True, cbar_kws={'label': 'ppm'})
 
 
     # Название графика
