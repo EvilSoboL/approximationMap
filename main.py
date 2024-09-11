@@ -22,10 +22,10 @@ if __name__ == '__main__':
     #    'steam')
 
     #db.get_experiment_data('waste_oil_40_2024', 'steam', 'CO')
-    m.save_all_source_map_to_excel()
-    #m.save_all_source_map()
+    #m.save_all_source_map_to_excel()
+    m.save_all_source_map()
 
-    #m.save_all_rbf_map()
+    m.save_all_rbf_map()
     #m.save_all_rbf_map_to_excel()
 
     #m.save_all_co_min_map()
