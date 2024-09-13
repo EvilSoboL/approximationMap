@@ -109,7 +109,7 @@ class Map:
         for experiment_parameters in self.available_variations:
             if experiment_parameters[2] in COMPONENTS_TO_CONVERSATION_FROM_PPM_TO_MG_M3:
                 self.experiment_data.get_experiment_data(*experiment_parameters, convert_to_mg_m3=True)
-                fuel_axis, additive_axis, approximated_component_surface = self.experiment_data.get_rbf_data()
+                fuel_axis, additive_axis, approximated_component_surface = self.experiment_data.get_rbf_data(med_filter=False, non_zero=False)
                 save_rbf_plot(
                     self.experiment_data.fuel_name,
                     self.experiment_data.additive_name,
