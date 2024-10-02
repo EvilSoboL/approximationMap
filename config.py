@@ -21,3 +21,6 @@ STANDARD_O2 = 3
 
 ADDITIVES = ['air', 'steam']
 MEASURING_COMPONENTS = ['O2', 'CO', 'NO', 'NO2', 'NOx', 'CO2', 'SO2']
+
+# Компоненты которые измеряются в процентах
+PROCENT_COMPONENT = ['CO2', 'O2']
