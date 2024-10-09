@@ -6,49 +6,7 @@ import seaborn as sns
 from config import PATH_TO_SOURCE_PLOT, PATH_TO_RBF_PLOT, PROCENT_COMPONENT
 
 
-def save_source_plot(
-         fuel_name: str,
-        additive_name: str,
-        component_name: str,
-        fuel_consumptions: list,
-        additive_consumptions: list,
-        component_matrix: np.ndarray,
-        ppm: bool = True,
-        russian: bool = False):
-
-    fig, ax = plt.subplots(figsize=(16, 9))
-    plt.rcParams.update({'font.size': 18})
-
-    sns.heatmap(component_matrix, linewidths=1.5, annot=True, fmt='.0f', ax=ax, cbar=True, cbar_kws={'label': 'ppm'})
-
-    # Название графика
-    if component_name in PROCENT_COMPONENT:
-        plt.title(f'{component_name}, vol. %')
-    else:
-        plt.title(f'{component_name}, ppm')
-
-    # Подпись расхода топлива и вводимого кмопонента
-    fuel_axis = [np.round(fuel_consumption, decimals=2) for fuel_consumption in fuel_consumptions]
-    additive_axis = [np.round(additive_consumption, decimals=2) for additive_consumption in reversed(additive_consumptions)]
-
-    plt.xticks(range(len(fuel_axis)), fuel_axis)
-    plt.yticks(range(len(additive_axis)), additive_axis)
-
-    if fuel_name == 'waste_oil':
-        ax.set_xlabel(r"$F_{\text{waste oil}}$, kg/h")
-
-    elif fuel_name == 'crude_oil':
-        ax.set_xlabel(r"$F_{\text{crude oil}}$, kg/h")
-
-    elif fuel_name == 'heavy_oil':
-        ax.set_xlabel(r"$F_{\text{heavy oil}}$, kg/h")
-
-    else:
-        ax.set_xlabel('fuel consumption, kg/h')
-    ax.set_ylabel('additive consumption, kg/h')
-
-    plt.tight_layout()
-
+def save_plot(fuel_name: str, additive_name: str, component_name: str, ppm: bool = True) -> None:
     if not os.path.exists(PATH_TO_SOURCE_PLOT):
         os.mkdir(PATH_TO_SOURCE_PLOT)
     if ppm:
@@ -60,6 +18,58 @@ def save_source_plot(
             PATH_TO_SOURCE_PLOT + f"/{fuel_name}_{additive_name}_{component_name}_mg_m3.png"
         )
     plt.close()
+
+
+def save_source_plot(
+        fuel_name: str,
+        additive_name: str,
+        component_name: str,
+        fuel_consumptions: list,
+        additive_consumptions: list,
+        component_matrix: np.ndarray,
+        ppm: bool = True,
+        russian: bool = False) -> None:
+
+    fig, ax = plt.subplots(figsize=(16, 9))
+    plt.rcParams.update({'font.size': 18})
+
+    sns.heatmap(component_matrix, linewidths=1.5, annot=True, fmt='.0f', ax=ax, cbar=True, cbar_kws={'label': 'ppm'})
+
+    # Название графика
+    if component_name in PROCENT_COMPONENT:
+        plt.title(f'{fuel_name}, {component_name}, vol. %')
+    else:
+        plt.title(f'{fuel_name}, {component_name}, ppm')
+
+    # Подпись значений расхода топлива и вводимого кмопонента
+    fuel_axis = [np.round(fuel_consumption, decimals=2) for fuel_consumption in fuel_consumptions]
+    additive_axis = [np.round(additive_consumption, decimals=2) for additive_consumption in reversed(additive_consumptions)]
+
+    plt.xticks(range(len(fuel_axis)), fuel_axis)
+    plt.yticks(range(len(additive_axis)), additive_axis)
+
+    if russian:
+        # Подпись оси y
+        if additive_name == 'air':
+            ax.set_ylabel('Расход воздуха, кг/ч')
+        else:
+            ax.set_ylabel('Расход пара, кг/ч')
+
+        # Подпись оси x
+        ax.set_xlabel('Расход топлива, кг/ч')
+
+    else:
+        # Подпись оси y
+        if additive_name == 'air':
+            ax.set_ylabel('Air consumption, kg/h')
+        else:
+            ax.set_ylabel('Steam consumption, kg/h')
+
+        # Подпись оси x
+        ax.set_xlabel('Fuel consumption, kg/h')
+
+    plt.tight_layout()
+    save_plot(fuel_name, additive_name, component_name, ppm)
 
 
 def save_rbf_plot(fuel_name,

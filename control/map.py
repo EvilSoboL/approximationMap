@@ -22,7 +22,7 @@ class Map:
         self.database = DatabaseHandler()
         self.available_variations = self.experiment_data.get_all_available_variations()
 
-    def save_all_source_map(self) -> None:
+    def save_all_source_map(self, russian: bool = False) -> None:
         """
         Метод, который сохраняет результаты экспериментов в виде матрицы.
         """
@@ -37,10 +37,10 @@ class Map:
                 fuel_axis,
                 additive_axis,
                 component_matrix,
-                ppm=True
+                ppm=True,
+                russian=russian
             )
 
-        # Сохранение карт в мг/м3
         for experiment_parameters in self.available_variations:
             if experiment_parameters[2] in COMPONENTS_TO_CONVERSATION_FROM_PPM_TO_MG_M3:
                 self.experiment_data.get_experiment_data(*experiment_parameters, convert_to_mg_m3=True)
