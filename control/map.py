@@ -11,7 +11,8 @@ from config import (PATH_TO_SOURCE_PLOT,
                     COMPONENTS_TO_CONVERSATION_FROM_PPM_TO_MG_M3,
                     PATH_TO_RBF_PLOT,
                     PATH_TO_CO_MIN_PLOT,
-                    PATH_TO_O2_MIN_PLOT)
+                    PATH_TO_O2_MIN_PLOT,
+                    PROCENT_COMPONENT)
 from control.utils import get_min_indexes_in_approximated_surface, linear_function
 from control.plot_config import save_source_plot, save_rbf_plot
 
@@ -293,11 +294,6 @@ class Map:
                     PATH_TO_O2_MIN_PLOT + f"/{self.experiment_data.fuel_name}_{self.experiment_data.additive_name}_{self.experiment_data.component_name}.png"
                 )
 
-    def show_fuel_map(self, fuel_name, additive_name, component_name):
-        self.experiment_data.get_experiment_data(fuel_name, additive_name, component_name, convert_to_mg_m3=False)
-        self.experiment_data.get_rbf_data(med_filter=False, non_zero=False)
-        save_rbf_plot()
-
     def show_3d_plot(self,
                      fuel_name: str,
                      additive_name: str,
@@ -342,3 +338,41 @@ class Map:
 
         plt.show()
 
+    def show_map_without_postprocessing(self,
+                                        fuel_name: str,
+                                        additive_name: str,
+                                        component_name: str,
+                                        russian: bool = False) -> None:
+        self.experiment_data.get_experiment_data(fuel_name, additive_name, component_name, convert_to_mg_m3=False)
+        fuel_axis, additive_axis, approximated_component_surface = self.experiment_data.get_rbf_data(med_filter=False,
+                                                                                                     non_zero=False)
+        fig, ax = plt.subplots()
+
+        plt.contourf(fuel_axis, additive_axis, approximated_component_surface)
+
+        plt.title(f'{fuel_name}, {component_name}')
+
+        if russian:
+            if component_name == "air":
+                ax.set_ylabel('Расход воздуха, кг/ч')
+            else:
+                ax.set_ylabel('Расход пара, кг/ч')
+
+            ax.set_xlabel('Расход топлива, кг/ч')
+        else:
+            if component_name == "air":
+                ax.set_ylabel('Air consumption, kg/h')
+            else:
+                ax.set_ylabel('Steam consumption, kg/h')
+
+            ax.set_xlabel('Fuel consumption, kg/h')
+
+        clb = plt.colorbar()
+
+        if component_name in PROCENT_COMPONENT:
+            clb.ax.set_title(r"vol.%")
+        else:
+            clb.ax.set_title("ppm")
+
+        plt.tight_layout()
+        plt.show()

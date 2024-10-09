@@ -1,5 +1,3 @@
-import os
-
 from control.map import Map
 from control.experiment_data import ExperimentData
 from control.database import DatabaseHandler
@@ -14,4 +12,5 @@ if __name__ == '__main__':
     gas_analysis = GetExperimentData()
 
     #m.save_all_source_map(russian=True)
-    m.show_3d_plot('diesel', 'steam', 'CO', russian=True)
+    #m.show_3d_plot('diesel', 'steam', 'CO', russian=True)
+    m.show_map_without_postprocessing('diesel', 'steam', 'CO', russian=True)

@@ -143,7 +143,7 @@ def save_rbf_plot(fuel_name,
 
     plt.tight_layout()
 
-    if save:
+    if save:  # Для получения линий уровня
         if not os.path.exists(PATH_TO_RBF_PLOT):
             os.mkdir(PATH_TO_RBF_PLOT)
         if ppm:
