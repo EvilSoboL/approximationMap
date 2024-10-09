@@ -6,16 +6,16 @@ import seaborn as sns
 from config import PATH_TO_SOURCE_PLOT, PATH_TO_RBF_PLOT, PROCENT_COMPONENT
 
 
-def save_plot(fuel_name: str, additive_name: str, component_name: str, ppm: bool = True) -> None:
-    if not os.path.exists(PATH_TO_SOURCE_PLOT):
-        os.mkdir(PATH_TO_SOURCE_PLOT)
+def save_plot(dir_to_save: str, fuel_name: str, additive_name: str, component_name: str, ppm: bool = True) -> None:
+    if not os.path.exists(dir_to_save):
+        os.mkdir(dir_to_save)
     if ppm:
         plt.savefig(
-            PATH_TO_SOURCE_PLOT + f"/{fuel_name}_{additive_name}_{component_name}.png"
+            dir_to_save + f"/{fuel_name}_{additive_name}_{component_name}.png"
         )
     else:
         plt.savefig(
-            PATH_TO_SOURCE_PLOT + f"/{fuel_name}_{additive_name}_{component_name}_mg_m3.png"
+            dir_to_save + f"/{fuel_name}_{additive_name}_{component_name}_mg_m3.png"
         )
     plt.close()
 
@@ -69,7 +69,7 @@ def save_source_plot(
         ax.set_xlabel('Fuel consumption, kg/h')
 
     plt.tight_layout()
-    save_plot(fuel_name, additive_name, component_name, ppm)
+    save_plot(PATH_TO_SOURCE_PLOT, fuel_name, additive_name, component_name, ppm)
 
 
 def save_rbf_plot(fuel_name,

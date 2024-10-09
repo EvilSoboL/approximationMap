@@ -13,4 +13,5 @@ if __name__ == '__main__':
     flame = FlameHeightUploader()
     gas_analysis = GetExperimentData()
 
-    m.save_all_source_map(russian=False)
+    #m.save_all_source_map(russian=True)
+    m.show_3d_plot('diesel', 'steam', 'CO', russian=True)

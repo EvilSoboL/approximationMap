@@ -298,3 +298,47 @@ class Map:
         self.experiment_data.get_rbf_data(med_filter=False, non_zero=False)
         save_rbf_plot()
 
+    def show_3d_plot(self,
+                     fuel_name: str,
+                     additive_name: str,
+                     component_name: str,
+                     russian: bool = False) -> None:
+        self.experiment_data.get_experiment_data(fuel_name, additive_name, component_name, convert_to_mg_m3=False)
+
+        x = list(self.experiment_data.df["F_fuel"])
+        y = list(self.experiment_data.df[f"F_{additive_name}"])
+        z = list(self.experiment_data.df[f"{component_name}"])
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection="3d")
+
+        approx_x, approx_y, approx_z = self.experiment_data.get_rbf_data(med_filter=False, non_zero=False)
+        x_grid, y_grid = np.meshgrid(approx_x, approx_y)
+
+        ax.plot_surface(x_grid, y_grid, approx_z, rstride=1, cstride=1, cmap='viridis', alpha=0.8)
+        plt.title(f'{fuel_name}')
+
+        if russian:
+            ax.scatter(x, y, z, c='r', marker='o', label='Экспериментальные данные')
+            ax.set_xlabel('Расход топлива, кг/ч')
+
+            if additive_name == 'air':
+                ax.set_ylabel(f'Расход воздуха, кг/ч')
+
+            else:
+                ax.set_ylabel(f'Расход пара, кг/ч')
+        else:
+            ax.scatter(x, y, z, c='r', marker='o', label='Experimental data')
+            ax.set_xlabel('Fuel consumption, kg/h')
+
+            if additive_name == 'air':
+                ax.set_ylabel(f'Air consumption, kg/h')
+
+            else:
+                ax.set_ylabel(f'Steam consumption, kg/h')
+
+        ax.set_zlabel(f'{component_name}, ppm')
+        plt.legend()
+
+        plt.show()
+
