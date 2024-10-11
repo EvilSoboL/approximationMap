@@ -88,7 +88,7 @@ class Map:
                     self.experiment_data.df.to_excel(writer, sheet_name=sheet_name)
                     df_component_matrix.to_excel(writer, sheet_name=sheet_name, startcol=6)
 
-    def save_all_rbf_map(self) -> None:
+    def save_all_rbf_map(self, russian: bool = False) -> None:
         """
         Метод, который сохраняет аппроксимативные карты, созданные с помощью RbfInterpolator(linear), с удаленными
         отрицательными значениями и применением медианного фильтра.
@@ -104,8 +104,10 @@ class Map:
                 fuel_axis,
                 additive_axis,
                 approximated_component_surface,
-                ppm=True
+                ppm=True,
+                russian=russian
             )
+
         # Сохранение карт в мг/м3
         for experiment_parameters in self.available_variations:
             if experiment_parameters[2] in COMPONENTS_TO_CONVERSATION_FROM_PPM_TO_MG_M3:
@@ -118,7 +120,8 @@ class Map:
                     fuel_axis,
                     additive_axis,
                     approximated_component_surface,
-                    ppm=False
+                    ppm=False,
+                    russian=russian
                 )
 
     def save_all_rbf_map_to_excel(self) -> None:
