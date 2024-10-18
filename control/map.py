@@ -11,7 +11,8 @@ from config import (PATH_TO_SOURCE_PLOT,
                     COMPONENTS_TO_CONVERSATION_FROM_PPM_TO_MG_M3,
                     PATH_TO_RBF_PLOT,
                     PATH_TO_CO_MIN_PLOT,
-                    PATH_TO_O2_MIN_PLOT)
+                    PATH_TO_O2_MIN_PLOT,
+                    PROCENT_COMPONENT)
 from control.utils import get_min_indexes_in_approximated_surface, linear_function
 from control.plot_config import save_source_plot, save_rbf_plot
 
@@ -22,7 +23,7 @@ class Map:
         self.database = DatabaseHandler()
         self.available_variations = self.experiment_data.get_all_available_variations()
 
-    def save_all_source_map(self) -> None:
+    def save_all_source_map(self, russian: bool = False) -> None:
         """
         Метод, который сохраняет результаты экспериментов в виде матрицы.
         """
@@ -37,10 +38,10 @@ class Map:
                 fuel_axis,
                 additive_axis,
                 component_matrix,
-                ppm=True
+                ppm=True,
+                russian=russian
             )
 
-        # Сохранение карт в мг/м3
         for experiment_parameters in self.available_variations:
             if experiment_parameters[2] in COMPONENTS_TO_CONVERSATION_FROM_PPM_TO_MG_M3:
                 self.experiment_data.get_experiment_data(*experiment_parameters, convert_to_mg_m3=True)
@@ -87,7 +88,7 @@ class Map:
                     self.experiment_data.df.to_excel(writer, sheet_name=sheet_name)
                     df_component_matrix.to_excel(writer, sheet_name=sheet_name, startcol=6)
 
-    def save_all_rbf_map(self) -> None:
+    def save_all_rbf_map(self, russian: bool = False) -> None:
         """
         Метод, который сохраняет аппроксимативные карты, созданные с помощью RbfInterpolator(linear), с удаленными
         отрицательными значениями и применением медианного фильтра.
@@ -103,8 +104,10 @@ class Map:
                 fuel_axis,
                 additive_axis,
                 approximated_component_surface,
-                ppm=True
+                ppm=True,
+                russian=russian
             )
+
         # Сохранение карт в мг/м3
         for experiment_parameters in self.available_variations:
             if experiment_parameters[2] in COMPONENTS_TO_CONVERSATION_FROM_PPM_TO_MG_M3:
@@ -117,7 +120,8 @@ class Map:
                     fuel_axis,
                     additive_axis,
                     approximated_component_surface,
-                    ppm=False
+                    ppm=False,
+                    russian=russian
                 )
 
     def save_all_rbf_map_to_excel(self) -> None:
@@ -293,8 +297,85 @@ class Map:
                     PATH_TO_O2_MIN_PLOT + f"/{self.experiment_data.fuel_name}_{self.experiment_data.additive_name}_{self.experiment_data.component_name}.png"
                 )
 
-    def show_fuel_map(self, fuel_name, additive_name, component_name):
+    def show_3d_plot(self,
+                     fuel_name: str,
+                     additive_name: str,
+                     component_name: str,
+                     russian: bool = False) -> None:
         self.experiment_data.get_experiment_data(fuel_name, additive_name, component_name, convert_to_mg_m3=False)
-        self.experiment_data.get_rbf_data(med_filter=False, non_zero=False)
-        save_rbf_plot()
 
+        x = list(self.experiment_data.df["F_fuel"])
+        y = list(self.experiment_data.df[f"F_{additive_name}"])
+        z = list(self.experiment_data.df[f"{component_name}"])
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection="3d")
+
+        approx_x, approx_y, approx_z = self.experiment_data.get_rbf_data(med_filter=False, non_zero=False)
+        x_grid, y_grid = np.meshgrid(approx_x, approx_y)
+
+        ax.plot_surface(x_grid, y_grid, approx_z, rstride=1, cstride=1, cmap='viridis', alpha=0.8)
+        plt.title(f'{fuel_name}')
+
+        if russian:
+            ax.scatter(x, y, z, c='r', marker='o', label='Экспериментальные данные')
+            ax.set_xlabel('Расход топлива, кг/ч')
+
+            if additive_name == 'air':
+                ax.set_ylabel(f'Расход воздуха, кг/ч')
+
+            else:
+                ax.set_ylabel(f'Расход пара, кг/ч')
+        else:
+            ax.scatter(x, y, z, c='r', marker='o', label='Experimental data')
+            ax.set_xlabel('Fuel consumption, kg/h')
+
+            if additive_name == 'air':
+                ax.set_ylabel(f'Air consumption, kg/h')
+
+            else:
+                ax.set_ylabel(f'Steam consumption, kg/h')
+
+        ax.set_zlabel(f'{component_name}, ppm')
+        plt.legend()
+
+        plt.show()
+
+    def show_map_without_postprocessing(self,
+                                        fuel_name: str,
+                                        additive_name: str,
+                                        component_name: str,
+                                        russian: bool = False) -> None:
+        self.experiment_data.get_experiment_data(fuel_name, additive_name, component_name, convert_to_mg_m3=False)
+        fuel_axis, additive_axis, approximated_component_surface = self.experiment_data.get_rbf_data(med_filter=False,
+                                                                                                     non_zero=False)
+        fig, ax = plt.subplots()
+
+        plt.contourf(fuel_axis, additive_axis, approximated_component_surface)
+
+        plt.title(f'{fuel_name}, {component_name}')
+
+        if russian:
+            if component_name == "air":
+                ax.set_ylabel('Расход воздуха, кг/ч')
+            else:
+                ax.set_ylabel('Расход пара, кг/ч')
+
+            ax.set_xlabel('Расход топлива, кг/ч')
+        else:
+            if component_name == "air":
+                ax.set_ylabel('Air consumption, kg/h')
+            else:
+                ax.set_ylabel('Steam consumption, kg/h')
+
+            ax.set_xlabel('Fuel consumption, kg/h')
+
+        clb = plt.colorbar()
+
+        if component_name in PROCENT_COMPONENT:
+            clb.ax.set_title(r"vol.%")
+        else:
+            clb.ax.set_title("ppm")
+
+        plt.tight_layout()
+        plt.show()

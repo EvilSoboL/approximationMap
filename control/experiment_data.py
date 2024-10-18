@@ -332,26 +332,6 @@ class ExperimentData:
                 else:
                     self.o2_equation_dict[f"{self.fuel_name}_{self.additive_name}"] = f"y  = {a_val: .2f}x +{b_val: .2f}"
 
-    def show_3d_plot(self):
-        x = list(self.df["F_fuel"])
-        y = list(self.df[f"F_{self.additive_name}"])
-        z = list(self.df[f"{self.component_name}"])
-
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection="3d")
-        ax.scatter(x, y, z, c='r', marker='o')
-
-        approx_x, approx_y, approx_z = self.get_rbf_data(med_filter=False, non_zero=False)
-        x_grid, y_grid = np.meshgrid(approx_x, approx_y)
-
-        ax.plot_surface(x_grid, y_grid, approx_z, rstride=1, cstride=1, cmap='viridis', alpha=0.8, label='Поверхность')
-
-        ax.set_xlabel('F_fuel, kg/h')
-        ax.set_ylabel(f'F_{self.additive_name}, kg/h')
-        ax.set_zlabel(f'{self.component_name}, ppm')
-
-        plt.show()
-
     def get_approx_surface_in_tableview(self):
         """
         Метод, который возвращает аппроксимированные поверхности в виде df.
