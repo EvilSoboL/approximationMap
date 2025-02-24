@@ -35,12 +35,6 @@ def save_source_plot(
 
     sns.heatmap(component_matrix, linewidths=1.5, annot=True, fmt='.0f', ax=ax, cbar=True, cbar_kws={'label': 'ppm'})
 
-    # Название графика
-    if component_name in PROCENT_COMPONENT:
-        plt.title(f'{fuel_name}, {component_name}, vol. %')
-    else:
-        plt.title(f'{fuel_name}, {component_name}, ppm')
-
     # Подпись значений расхода топлива и вводимого кмопонента
     fuel_axis = [np.round(fuel_consumption, decimals=2) for fuel_consumption in fuel_consumptions]
     additive_axis = [np.round(additive_consumption, decimals=2) for additive_consumption in reversed(additive_consumptions)]
@@ -48,7 +42,10 @@ def save_source_plot(
     plt.xticks(range(len(fuel_axis)), fuel_axis)
     plt.yticks(range(len(additive_axis)), additive_axis)
 
+    title = fuel_name + ', ' + component_name
+
     if russian:
+        plt.title(title_on_russian(title))
         # Подпись оси y
         if additive_name == 'air':
             ax.set_ylabel('Расход воздуха, кг/ч')
@@ -59,6 +56,7 @@ def save_source_plot(
         ax.set_xlabel('Расход топлива, кг/ч')
 
     else:
+        plt.title(title)
         # Подпись оси y
         if additive_name == 'air':
             ax.set_ylabel('Air consumption, kg/h')
@@ -91,9 +89,10 @@ def save_rbf_plot(fuel_name: str,
     else:
         plt.contourf(fuel_axis, additive_axis, approximated_component_surface)
 
-    plt.title(f'{fuel_name}, {component_name}')
+    title = f'{fuel_name}, {component_name}'
 
     if russian:
+        plt.title(title_on_russian(title))
         # Подпись оси y
         if additive_name == 'air':
             ax.set_ylabel('Расход воздуха, кг/ч')
@@ -104,6 +103,7 @@ def save_rbf_plot(fuel_name: str,
         ax.set_xlabel('Расход топлива, кг/ч')
 
     else:
+        plt.title(title)
         # Подпись оси y
         if additive_name == 'air':
             ax.set_ylabel('Air consumption, kg/h')
@@ -126,3 +126,11 @@ def save_rbf_plot(fuel_name: str,
 
     if save:  # Для получения линий уровня
         save_plot(PATH_TO_RBF_PLOT, fuel_name, additive_name, component_name, ppm=ppm)
+
+
+def title_on_russian(title: str) -> str:
+    translate = {
+        'diesel': 'Дизельное топливо',
+        'diesel, CO': 'Дизельное топливо, CO'
+    }
+    return translate.get(title, title)

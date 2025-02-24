@@ -15,6 +15,7 @@ from config import (PATH_TO_SOURCE_PLOT,
                     PROCENT_COMPONENT)
 from control.utils import get_min_indexes_in_approximated_surface, linear_function
 from control.plot_config import save_source_plot, save_rbf_plot
+import control.plot_config as plot_config
 
 
 class Map:
@@ -316,8 +317,9 @@ class Map:
 
         ax.plot_surface(x_grid, y_grid, approx_z, rstride=1, cstride=1, cmap='viridis', alpha=0.8)
         plt.title(f'{fuel_name}')
-
         if russian:
+            plt.title(f'{plot_config.title_on_russian(fuel_name)}')
+
             ax.scatter(x, y, z, c='r', marker='o', label='Экспериментальные данные')
             ax.set_xlabel('Расход топлива, кг/ч')
 
@@ -327,6 +329,8 @@ class Map:
             else:
                 ax.set_ylabel(f'Расход пара, кг/ч')
         else:
+            plt.title(f'{fuel_name}')
+
             ax.scatter(x, y, z, c='r', marker='o', label='Experimental data')
             ax.set_xlabel('Fuel consumption, kg/h')
 
@@ -353,9 +357,10 @@ class Map:
 
         plt.contourf(fuel_axis, additive_axis, approximated_component_surface)
 
-        plt.title(f'{fuel_name}, {component_name}')
+        title = f'{fuel_name}, {component_name}'
 
         if russian:
+            plt.title(plot_config.title_on_russian(title))
             if component_name == "air":
                 ax.set_ylabel('Расход воздуха, кг/ч')
             else:
@@ -363,6 +368,7 @@ class Map:
 
             ax.set_xlabel('Расход топлива, кг/ч')
         else:
+            plt.title(title)
             if component_name == "air":
                 ax.set_ylabel('Air consumption, kg/h')
             else:
