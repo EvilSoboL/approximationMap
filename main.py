@@ -14,4 +14,5 @@ if __name__ == '__main__':
     #m.save_all_source_map(russian=True)
     #m.show_3d_plot('diesel', 'steam', 'CO', russian=True)
     #m.show_map_without_postprocessing('diesel', 'steam', 'CO', russian=True)
-    m.save_all_rbf_map(russian=True)
+    m.save_all_co_min_map()
+    m.save_all_rbf_map()

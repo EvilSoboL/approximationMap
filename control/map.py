@@ -177,6 +177,8 @@ class Map:
                 self.experiment_data.get_experiment_data(*experiment_parameters)
                 fuel_axis, additive_axis, approximated_component_surface = self.experiment_data.get_rbf_data()
 
+                plt.figure(figsize=(10, 6))
+
                 save_rbf_plot(
                     self.experiment_data.fuel_name,
                     self.experiment_data.additive_name,
@@ -185,7 +187,8 @@ class Map:
                     additive_axis,
                     approximated_component_surface,
                     ppm=True,
-                    save=False
+                    save=False,
+                    russian=False
                 )
 
                 fuel_min_indexes, additive_min_indexes = get_min_indexes_in_approximated_surface(
@@ -195,28 +198,65 @@ class Map:
 
                 a_val, b_val = params  # Коэффициенты аппроксимированного линейного уравнения
                 additive_approx = linear_function(np.array(fuel_axis), a_val, b_val)
-                plt.plot(
-                    fuel_axis, additive_approx, color="black", linestyle='dashed', linewidth=4,
-                    label='Аппроксимированная линия минимальных значений CO'
+
+                # Аппроксимационная линия (чёрная пунктирная, тонкая)
+
+
+                # Линия минимумов и точки минимумов — жёлтые и тонкие/маленькие
+
+                plt.scatter(
+                    fuel_min_indexes, additive_min_indexes,
+                    s=5, facecolors='yellow', edgecolors='yellow', zorder=5
                 )
 
-                # Обрезаем часть графика, чтобы линия интерполяции не выходила за пределы интерполяционной поверхнсоти
-                plt.ylim(min(additive_min_indexes), max(additive_min_indexes))
+                plt.plot(
+                    fuel_min_indexes, additive_min_indexes,
+                    color="yellow", marker='o', linestyle='-', linewidth=1, markersize=0.2,
+                    label='Min CO line', zorder=4
+                )
 
+                plt.plot(
+                    fuel_axis, additive_approx, color="black", linestyle='dashed', linewidth=2,
+                    label='Approx. grad. min CO cons.'
+                )
+
+                # Вычисление R^2
+                y_true = np.array(additive_min_indexes, dtype=float)
+                y_pred = linear_function(np.array(fuel_min_indexes, dtype=float), a_val, b_val)
+                ss_res = np.sum((y_true - y_pred) ** 2)
+                ss_tot = np.sum((y_true - np.mean(y_true)) ** 2)
+                if np.isclose(ss_tot, 0.0):
+                    r2 = 1.0 if np.isclose(ss_res, 0.0) else 0.0
+                else:
+                    r2 = 1.0 - ss_res / ss_tot
+
+                # Обрезаем по Y в пределах найденных минимумов, ставим легенду и заголовок с R^2
+                plt.ylim(min(additive_min_indexes), max(additive_min_indexes))
                 plt.legend()
+                plt.title(
+                    f'{self.experiment_data.fuel_name} — {self.experiment_data.additive_name} — '
+                    f'{self.experiment_data.component_name}   R²={r2:.3f}'
+                )
 
                 if not os.path.exists(PATH_TO_CO_MIN_PLOT):
                     os.mkdir(PATH_TO_CO_MIN_PLOT)
 
+                r2_fname = f'R2_{r2:.3f}'.replace('.', '_')
                 plt.savefig(
-                    PATH_TO_CO_MIN_PLOT + f'/{self.experiment_data.fuel_name}_{self.experiment_data.additive_name}_{self.experiment_data.component_name}.png'
+                    PATH_TO_CO_MIN_PLOT + f'/{self.experiment_data.fuel_name}_'
+                                          f'{self.experiment_data.additive_name}_'
+                                          f'{self.experiment_data.component_name}_{r2_fname}.png'
                 )
                 plt.close()
+
         # Сохранение карт в мг/м3
         for experiment_parameters in self.available_variations:
             if experiment_parameters[2] == 'CO':
                 self.experiment_data.get_experiment_data(*experiment_parameters, convert_to_mg_m3=True)
                 fuel_axis, additive_axis, approximated_component_surface = self.experiment_data.get_rbf_data()
+
+                plt.figure(figsize=(10, 6))
+
                 save_rbf_plot(
                     self.experiment_data.fuel_name,
                     self.experiment_data.additive_name,
@@ -225,7 +265,8 @@ class Map:
                     additive_axis,
                     approximated_component_surface,
                     ppm=False,
-                    save=False
+                    save=False,
+                    russian=False
                 )
 
                 fuel_min_indexes, additive_min_indexes = get_min_indexes_in_approximated_surface(
@@ -235,20 +276,49 @@ class Map:
 
                 a_val, b_val = params  # Коэффициенты аппроксимированного линейного уравнения
                 additive_approx = linear_function(np.array(fuel_axis), a_val, b_val)
+
+                # Аппроксимационная линия (чёрная пунктирная, тонкая)
                 plt.plot(
-                    fuel_axis, additive_approx, color="black", linestyle='dashed', linewidth=4, label='Аппроксимированная линия минимальных значений CO'
+                    fuel_axis, additive_approx, color="black", linestyle='dashed', linewidth=1.5,
+                    label='Аппроксимированная линия минимальных значений CO'
                 )
 
-                # Обрезаем часть графика, чтобы линия интерполяции не выходила за пределы интерполяционной поверхности
-                plt.ylim(min(additive_min_indexes), max(additive_min_indexes))
+                # Линия минимумов и точки минимумов — жёлтые и маленькие
+                plt.plot(
+                    fuel_min_indexes, additive_min_indexes,
+                    color="yellow", marker='o', linestyle='-', linewidth=1, markersize=1,
+                    label='Линия минимумов CO', zorder=4
+                )
+                plt.scatter(
+                    fuel_min_indexes, additive_min_indexes,
+                    s=20, facecolors='yellow', edgecolors='yellow', zorder=5
+                )
 
+                # R^2
+                y_true = np.array(additive_min_indexes, dtype=float)
+                y_pred = linear_function(np.array(fuel_min_indexes, dtype=float), a_val, b_val)
+                ss_res = np.sum((y_true - y_pred) ** 2)
+                ss_tot = np.sum((y_true - np.mean(y_true)) ** 2)
+                if np.isclose(ss_tot, 0.0):
+                    r2 = 1.0 if np.isclose(ss_res, 0.0) else 0.0
+                else:
+                    r2 = 1.0 - ss_res / ss_tot
+
+                plt.ylim(min(additive_min_indexes), max(additive_min_indexes))
                 plt.legend()
+                plt.title(
+                    f'{self.experiment_data.fuel_name} — {self.experiment_data.additive_name} — '
+                    f'{self.experiment_data.component_name}   R²={r2:.3f}'
+                )
 
                 if not os.path.exists(PATH_TO_CO_MIN_PLOT):
                     os.mkdir(PATH_TO_CO_MIN_PLOT)
 
+                r2_fname = f'R2_{r2:.3f}'.replace('.', '_')
                 plt.savefig(
-                    PATH_TO_CO_MIN_PLOT + f'/{self.experiment_data.fuel_name}_{self.experiment_data.additive_name}_{self.experiment_data.component_name}_mg_m3.png'
+                    PATH_TO_CO_MIN_PLOT + f'/{self.experiment_data.fuel_name}_'
+                                          f'{self.experiment_data.additive_name}_'
+                                          f'{self.experiment_data.component_name}_mg_m3_{r2_fname}.png'
                 )
                 plt.close()
 
@@ -270,7 +340,8 @@ class Map:
                     additive_axis,
                     approximated_component_surface,
                     ppm=True,
-                    save=False
+                    save=False,
+                    russian=False
                 )
                 # Получаем уравнения контуров
                 levels = np.arange(0, approximated_component_surface.max() + 1.5, 1.5)
@@ -284,9 +355,12 @@ class Map:
                 params, covariance = curve_fit(linear_function, contour_x, contour_y)
                 a_val, b_val = params  # Коэффициенты аппроксимированного линейного уравнения
                 additive_approx = linear_function(np.array(fuel_axis), a_val, b_val)
+                '''
                 plt.plot(
                     fuel_axis, additive_approx, color="black", linestyle='dashed', linewidth=4, label=r'Аппроксимированная линия эталонного содержания $0_2$'
                 )
+                '''
+
                 # Обрезаем часть графика, чтобы линия интерполяции не выходила за пределы интерполяционной поверхности
                 plt.ylim(min(additive_axis), max(additive_axis))
 
